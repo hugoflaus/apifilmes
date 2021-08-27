@@ -26,5 +26,11 @@ namespace FilmesAPI.Controllers
         {
             return filmes;
         }
+
+        [HttpGet("{id}")]
+        public Filme RecuperarFilmesPorId(int id)
+        {
+            return filmes.FirstOrDefault(filme => filme.Id == id);
+        }
     }
 }
