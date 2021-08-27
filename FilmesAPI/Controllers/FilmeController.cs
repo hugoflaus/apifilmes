@@ -1,4 +1,5 @@
 ﻿using FilmesAPI.Data;
+using FilmesAPI.Data.Dtos;
 using FilmesAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -20,8 +21,16 @@ namespace FilmesAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult AdicionarFilme([FromBody]Filme filme)
+        public IActionResult AdicionarFilme([FromBody]CreateFilmeDto filmeDto)
         {
+            var filme = new Filme()
+            {
+                Titulo = filmeDto.Titulo,
+                Genero = filmeDto.Genero,
+                Duracao = filmeDto.Duracao,
+                Diretor = filmeDto.Diretor
+            };
+
             _context.Filmes.Add(filme);
             _context.SaveChanges();
            return CreatedAtAction(nameof(RecuperarFilmesPorId), new { Id = filme.Id }, filme);
@@ -40,14 +49,24 @@ namespace FilmesAPI.Controllers
 
             if(filme != null)
             {
-                return Ok(filme);
+                var filmeDto = new ReadFilmeDto()
+                {
+                    Titulo = filme.Titulo,
+                    Diretor = filme.Diretor,
+                    Duracao = filme.Duracao,
+                    Id = filme.Id,
+                    Genero = filme.Genero,
+                    HoraDaConsulta = DateTime.Now
+                };
+
+                return Ok(filmeDto);
             }
 
             return NotFound();
         }
 
         [HttpPut("{id}")]
-        public IActionResult AtualizaFilme([FromBody]Filme filmeAtualizado, int id)
+        public IActionResult AtualizaFilme([FromBody]UpdateFilmeDto filmeDto, int id)
         {
             var filme = _context.Filmes.FirstOrDefault(filme => filme.Id == id);
             if(filme == null)
@@ -55,10 +74,10 @@ namespace FilmesAPI.Controllers
                 return NotFound();
             }
 
-            filme.Titulo = filmeAtualizado.Titulo;
-            filme.Genero = filmeAtualizado.Genero;
-            filme.Duracao = filmeAtualizado.Duracao;
-            filme.Diretor = filmeAtualizado.Diretor;
+            filme.Titulo = filmeDto.Titulo;
+            filme.Genero = filmeDto.Genero;
+            filme.Duracao = filmeDto.Duracao;
+            filme.Diretor = filmeDto.Diretor;
 
             _context.SaveChanges();
 
